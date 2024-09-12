@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: arc-owntube-runner
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
