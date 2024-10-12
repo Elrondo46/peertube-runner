@@ -1,3 +1,4 @@
+
 # [`owntube/peertube-runner`](https://github.com/OwnTube-tv/peertube-runner)
 
 Containerized Node [`@peertube/peertube-runner`](https://www.npmjs.com/package/@peertube/peertube-runner) for
@@ -23,23 +24,23 @@ docker run -it --rm -u root --name v521-runner-server \
   owntube/peertube-runner:v521 peertube-runner server
 ```
 
-### Image Variant 2: `owntube/peertube-runner:v603` (`latest`) from PeerTube v6.0.3
+### Image Variant 2: `owntube/peertube-runner:v621` (`latest`) from PeerTube v6.2.1
 
 Build the container image:
 
 ```bash
-docker build -f Dockerfile.bookworm -t owntube/peertube-runner:v603 .
-docker tag owntube/peertube-runner:v603 owntube/peertube-runner:latest
+docker buildx build --platform linux/amd64 -f Dockerfile.bookworm -t owntube/peertube-runner:v621 .
+docker tag owntube/peertube-runner:v621 owntube/peertube-runner:latest
 ```
 
 Test running the PeerTube runner server:
 
 ```bash
-docker run -it --rm -u root --name v603-runner-server \
+docker run -it --rm -u 999 --name v621-runner-server \
   -v $PWD/dot-local:/home/peertube/.local/share/peertube-runner-nodejs \
   -v $PWD/dot-config:/home/peertube/.config/peertube-runner-nodejs \
   -v $PWD/dot-cache:/home/peertube/.cache/peertube-runner-nodejs \
-  owntube/peertube-runner:v603 peertube-runner server
+  owntube/peertube-runner:v621 npx peertube-runner server
 ```
 
 ## Kubernetes Deployment
@@ -133,8 +134,8 @@ spec:
         - name: peertube-runner-cache
           mountPath: /home/peertube/.cache/peertube-runner-nodejs
     - name: peertube-runner-2
-      image: owntube/peertube-runner:v603
-      command: ["peertube-runner"]
+      image: owntube/peertube-runner:v621
+      command: ["npx", "peertube-runner"]
       args: ["server", "--id", "peertube-runner-2"]
       volumeMounts:
         - name: peertube-runner-local
@@ -166,7 +167,7 @@ The logs should show no errors and indicate that the servers are up and idling.
 ### Setup Step 3: Register the Runners with PeerTube Instances
 
 For illustration, let us assume that you have a PeerTube v5.2 instance that you want to connect `"peertube-runner-1"`
-to, and a PeerTube v6.0 instance that you want to connect `"peertube-runner-2"` to.
+to, and a PeerTube v6.2 instance that you want to connect `"peertube-runner-2"` to.
 
 Get the URLs and the _Registration Tokens_ for each of the PeerTube instances and register via `peertube-runner` CLI:
 
@@ -188,26 +189,26 @@ kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUN
 ```
 
 ```bash
-export PT_v60_RUNNER=peertube-runner-2
-export PT_v60_URL=https://my-peertube60.tv
-export PT_v60_TOKEN=ptrrt-23586320-b92e-4521-21f7-3b4e1dc2b952
-kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER \
-  register --url $PT_v60_URL --registration-token $PT_v60_TOKEN \
-  --runner-name my-$PT_v60_RUNNER --runner-description="OwnTube-tv/peertube-runner project"
+export PT_v62_RUNNER=peertube-runner-2
+export PT_v62_URL=https://my-peertube62.tv
+export PT_v62_TOKEN=ptrrt-23586320-b92e-4521-21f7-3b4e1dc2b952
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v62_RUNNER \
+  npx register --url $PT_v62_URL --registration-token $PT_v62_TOKEN \
+  --runner-name my-$PT_v62_RUNNER --runner-description="OwnTube-tv/peertube-runner project"
 # Verify it is registered:
-kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER \
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v62_RUNNER \
   list-registered
 '┌──────────────────────────┬──────────────────────┬────────────────────────────────────┐'
 '│ instance                 │ runner name          │ runner description                 │'
 '├──────────────────────────┼──────────────────────┼────────────────────────────────────┤'
-'│ https://my-peertube60.tv │ my-peertube-runner-2 │ OwnTube-tv/peertube-runner project │'
+'│ https://my-peertube62.tv │ my-peertube-runner-2 │ OwnTube-tv/peertube-runner project │'
 '└──────────────────────────┴──────────────────────┴────────────────────────────────────┘'
 ```
 
 Once transcoding starts being processed, you should find that there are a few files in the persistent storage, but they
 are not expected to accumulate over time in terms of volume.
 
-Here is an illustration from my Kubernetes master, what it usually looks like (structurally):
+Here is an illustration from my Kubernetes worker node, what it usually looks like (structurally):
 
 ```plain
 /mnt/hostpath-lv/
