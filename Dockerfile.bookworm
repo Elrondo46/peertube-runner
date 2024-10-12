@@ -1,15 +1,20 @@
-# https://github.com/Chocobozzz/PeerTube/blob/v6.0.3/support/docker/production/Dockerfile.bookworm
-FROM chocobozzz/peertube:v6.0.3-bookworm
+# https://github.com/Chocobozzz/PeerTube/blob/v6.2.1/support/docker/production/Dockerfile.bookworm
+FROM chocobozzz/peertube:v6.2.1-bookworm
+
+RUN apt-get update && apt-get install -y \
+    pipx \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/peertube/
 
 ENV HOME=/home/peertube
 
-# https://docs.joinpeertube.org/maintain/tools#peertube-runner
-RUN npm install -g @peertube/peertube-runner
-
 # peertube
 USER 999
+
+# https://docs.joinpeertube.org/maintain/tools#peertube-runner
+RUN pipx install whisper-ctranslate2 && pipx ensurepath
+RUN npm install @peertube/peertube-runner
 
 VOLUME [ "/home/peertube/.config/peertube-runner-nodejs/" ]
 VOLUME [ "/home/peertube/.cache/peertube-runner-nodejs/" ]
@@ -17,4 +22,4 @@ VOLUME [ "/home/peertube/.local/share/peertube-runner-nodejs/" ]
 
 ENTRYPOINT [ ]
 
-CMD [ "peertube-runner" ]
+CMD [ "npx", "peertube-runner" ]
