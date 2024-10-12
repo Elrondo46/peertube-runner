@@ -6,7 +6,7 @@ WORKDIR /home/peertube/
 ENV HOME=/home/peertube
 
 # https://docs.joinpeertube.org/maintain/tools#peertube-runner
-RUN npm install -g @peertube/peertube-runner
+RUN npm install -g @peertube/peertube-runner@0.0.11
 
 # peertube
 USER 999

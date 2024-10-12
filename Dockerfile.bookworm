@@ -14,7 +14,7 @@ USER 999
 
 # https://docs.joinpeertube.org/maintain/tools#peertube-runner
 RUN pipx install whisper-ctranslate2 && pipx ensurepath
-RUN npm install @peertube/peertube-runner
+RUN npm install @peertube/peertube-runner@0.0.21
 
 VOLUME [ "/home/peertube/.config/peertube-runner-nodejs/" ]
 VOLUME [ "/home/peertube/.cache/peertube-runner-nodejs/" ]

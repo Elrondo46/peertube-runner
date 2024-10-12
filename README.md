@@ -6,12 +6,12 @@ remote execution of transcoding jobs in Kubernetes.
 
 ## Container Image Variants
 
-### Image Variant 1: `owntube/peertube-runner:v521` from PeerTube v5.2.1
+### Image Variant 1: `owntube/peertube-runner:v521` from PeerTube v5.2.1 with Runner v0.0.11
 
 Build the container image:
 
 ```bash
-docker build -f Dockerfile.bullseye -t owntube/peertube-runner:v521 .
+docker buildx build --platform linux/amd64 -f Dockerfile.bullseye -t owntube/peertube-runner:v521 .
 ```
 
 Test running the PeerTube runner server:
@@ -24,7 +24,7 @@ docker run -it --rm -u root --name v521-runner-server \
   owntube/peertube-runner:v521 peertube-runner server
 ```
 
-### Image Variant 2: `owntube/peertube-runner:v621` (`latest`) from PeerTube v6.2.1
+### Image Variant 2: `owntube/peertube-runner:v621` (`latest`) from PeerTube v6.2.1 with Runner v0.0.21
 
 Build the container image:
 
