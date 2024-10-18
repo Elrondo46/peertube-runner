@@ -56,7 +56,7 @@ def _generate_video_subtitles(hostname, bearer_token, video_uuid):
     return response.status_code
   except requests.exceptions.RequestException as e:
     click.echo(click.style(f"Error: {e}", fg='red'))
-    exit(1)
+    return e.response.status_code
 
 
 @click.command()
@@ -73,7 +73,7 @@ def check_and_schedule_slowly(hostname, bearer_token):
   # Find videos that have not been transcribed yet
   videos_by_subtitles_path = 'data/video-inventory-by-subtitles.json'
   with open(videos_by_subtitles_path, 'r') as videos_by_subtitles_file:
-    videos_by_subtitles = json.load(videos_by_subtitles_file)
+    videos_by_subtitles = json.loads(videos_by_subtitles_file.read())
 
   if not videos_by_subtitles['videos_without_subtitles']:
     click.echo(click.style("No videos found that need transcription.", fg='yellow'))
@@ -83,7 +83,11 @@ def check_and_schedule_slowly(hostname, bearer_token):
     click.echo(click.style(f"Found video UUID {video['uuid']} that need transcription.", fg='green'))
     videos_by_subtitles['videos_to_generate_subtitles'].append(video)
     job_status = _generate_video_subtitles(hostname, bearer_token, video['uuid'])
-    click.echo(click.style(f"Created job with status code {job_status} for video {video['uuid']}.", fg='green'))
+    if 200 <= job_status < 300:
+      click.echo(click.style(f"Created job with status code {job_status} for video {video['uuid']}.", fg='green'))
+    else:
+      click.echo(click.style(f"Failed to create job for video {video['uuid']} with status code {job_status}.",
+                             fg='yellow'))
     with open(videos_by_subtitles_path, 'w') as videos_by_subtitles_file:
       videos_by_subtitles_file.write(json.dumps(videos_by_subtitles, indent=2))
 

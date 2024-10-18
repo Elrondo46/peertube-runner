@@ -69,7 +69,7 @@ def _get_video_subtitles(hostname, bearer_token, video_uuid):
     return subtitles
   except requests.exceptions.RequestException as e:
     click.echo(click.style(f"Error: {e}", fg='red'))
-    return None
+    return []
 
 
 @click.command()
@@ -105,9 +105,8 @@ def build_video_inventory(hostname, bearer_token):
                              f"subtitles (total WITH {len(videos_with_subtitles)}).", fg='green'))
     else:
       videos_without_subtitles.append(video)
-      click.echo(
-        click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has {len(subtitles)} subtitles "
-                    f"(total WITHOUT {len(videos_without_subtitles)}).", fg='yellow'))
+      click.echo(click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has {len(subtitles)} "
+                             f"subtitles (total WITHOUT {len(videos_without_subtitles)}).", fg='yellow'))
 
   # Dump to JSON files
   videos_by_subtitles_path = 'data/video-inventory-by-subtitles.json'
