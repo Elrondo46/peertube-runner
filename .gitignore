@@ -1,2 +1,4 @@
 .idea/
+utils/data/
+venv/
 dot-*
