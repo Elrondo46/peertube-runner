@@ -18,7 +18,8 @@ def _get_active_jobs(hostname, bearer_token):
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     data = response.json()
-    pending_or_running_jobs = [job for job in data['data'] if job['state']['label'] not in ['Completed', 'Errored']]
+    pending_or_running_jobs = [job for job in data['data']
+                               if job['state']['label'] not in ['Completed', 'Cancelled', 'Errored']]
     click.echo(click.style(f"Response: Got {len(pending_or_running_jobs)} pending/running jobs from {url}",
                            fg='green'))
     for job in pending_or_running_jobs:
