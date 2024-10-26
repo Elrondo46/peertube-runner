@@ -24,23 +24,23 @@ docker run -it --rm -u root --name v521-runner-server \
   owntube/peertube-runner:v521 peertube-runner server
 ```
 
-### Image Variant 2: `owntube/peertube-runner:v621` (`latest`) from PeerTube v6.2.1 with Runner v0.0.21
+### Image Variant 2: `owntube/peertube-runner:v632` (`latest`) from PeerTube v6.3.2 with Runner v0.0.21
 
 Build the container image:
 
 ```bash
-docker buildx build --platform linux/amd64 -f Dockerfile.bookworm -t owntube/peertube-runner:v621 .
-docker tag owntube/peertube-runner:v621 owntube/peertube-runner:latest
+docker buildx build --platform linux/amd64 -f Dockerfile.bookworm -t owntube/peertube-runner:v632 .
+docker tag owntube/peertube-runner:v632 owntube/peertube-runner:latest
 ```
 
 Test running the PeerTube runner server:
 
 ```bash
-docker run -it --rm -u 999 --name v621-runner-server \
+docker run -it --rm -u 999 --name v632-runner-server \
   -v $PWD/dot-local:/home/peertube/.local/share/peertube-runner-nodejs \
   -v $PWD/dot-config:/home/peertube/.config/peertube-runner-nodejs \
   -v $PWD/dot-cache:/home/peertube/.cache/peertube-runner-nodejs \
-  owntube/peertube-runner:v621 npx peertube-runner server
+  owntube/peertube-runner:v632 npx peertube-runner server
 ```
 
 ## Kubernetes Deployment
@@ -134,7 +134,7 @@ spec:
         - name: peertube-runner-cache
           mountPath: /home/peertube/.cache/peertube-runner-nodejs
     - name: peertube-runner-2
-      image: owntube/peertube-runner:v621
+      image: owntube/peertube-runner:v632
       command: ["npx", "peertube-runner"]
       args: ["server", "--id", "peertube-runner-2"]
       volumeMounts:
@@ -167,7 +167,7 @@ The logs should show no errors and indicate that the servers are up and idling.
 ### Setup Step 3: Register the Runners with PeerTube Instances
 
 For illustration, let us assume that you have a PeerTube v5.2 instance that you want to connect `"peertube-runner-1"`
-to, and a PeerTube v6.2 instance that you want to connect `"peertube-runner-2"` to.
+to, and a PeerTube v6.3.2 instance that you want to connect `"peertube-runner-2"` to.
 
 Get the URLs and the _Registration Tokens_ for each of the PeerTube instances and register via `peertube-runner` CLI:
 
