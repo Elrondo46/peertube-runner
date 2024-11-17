@@ -9,7 +9,7 @@ jobs:
   build-and-push:
     runs-on: macOS
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Login to "owntube" organization on Docker Hub
       - uses: docker/login-action@v3
