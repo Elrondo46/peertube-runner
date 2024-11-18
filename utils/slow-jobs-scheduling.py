@@ -5,6 +5,8 @@ from datetime import datetime
 import click
 import requests
 
+STALE_STATES = ['Completed', 'Cancelled', 'Errored', 'Parent job failed']
+
 
 def _get_active_jobs(hostname, bearer_token):
   """Fetch remote runner jobs that are not in state 'Completed' or 'Errored', i.e. active."""
@@ -19,7 +21,7 @@ def _get_active_jobs(hostname, bearer_token):
     response.raise_for_status()
     data = response.json()
     pending_or_running_jobs = [job for job in data['data']
-                               if job['state']['label'] not in ['Completed', 'Cancelled', 'Errored']]
+                               if job['state']['label'] not in STALE_STATES]
     click.echo(click.style(f"Response: Got {len(pending_or_running_jobs)} pending/running jobs from {url}",
                            fg='green'))
     for job in pending_or_running_jobs:
