@@ -17,6 +17,7 @@ def _get_all_videos(hostname, bearer_token):
   params = {
     'sort': 'publishedAt',
     'nsfw': 'both',
+    'isLive': 'false',
     'isLocal': 'true',
     'include': '111',
     'privacyOneOf': [1, 2, 3, 4, 5],
