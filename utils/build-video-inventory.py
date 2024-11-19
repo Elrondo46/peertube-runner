@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import json
 import os
+import time
+
 import click
 import requests
 
@@ -65,12 +67,11 @@ def _get_video_subtitles(hostname, bearer_token, video_uuid):
   try:
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    data = response.json()
-    subtitles = data.get('data', [])
+    subtitles = response.json()
     return subtitles
   except requests.exceptions.RequestException as e:
     click.echo(click.style(f"Error: {e}", fg='red'))
-    return []
+    return None
 
 
 @click.command()
@@ -83,7 +84,7 @@ def build_video_inventory(hostname, bearer_token):
 
   all_videos_inventory_path = 'data/video-inventory.json'
   if os.path.exists(all_videos_inventory_path):
-    click.echo(click.style(f"Inventory file {all_videos_inventory_path} already exists, loading data form file.",
+    click.echo(click.style(f"Inventory file {all_videos_inventory_path} already exists, loading data from file.",
                            fg='green'))
     with open('data/video-inventory.json', 'r') as all_videos_file:
       all_videos = json.load(all_videos_file)
@@ -95,22 +96,35 @@ def build_video_inventory(hostname, bearer_token):
       all_videos_file.write(json.dumps(all_videos, indent=2))
   click.echo(click.style(f"Full video inventory loaded with {len(all_videos)} videos.", fg='green'))
 
+  # Check old "video-inventory-by-subtitles.json" file
+  videos_by_subtitles_path = 'data/video-inventory-by-subtitles.json'
+  known_video_subtitles = {}
+  if os.path.exists(videos_by_subtitles_path):
+    with open(videos_by_subtitles_path, 'r') as videos_by_subtitles_file:
+      videos_by_subtitles = json.loads(videos_by_subtitles_file.read())
+    if videos_by_subtitles['videos_with_subtitles']:
+      known_video_subtitles = {video['uuid']: video['captions']
+                               for video in videos_by_subtitles['videos_with_subtitles']}
+      click.echo(click.style(f"Existing video inventory loaded with {len(known_video_subtitles)} videos with "
+                             f"subtitles.", fg='green'))
+
   # Check each video for subtitles
   videos_with_subtitles = []
   videos_without_subtitles = []
   for idx, video in enumerate(all_videos):
-    subtitles = _get_video_subtitles(hostname, bearer_token, video['uuid'])
-    if subtitles:
+    subtitles = known_video_subtitles.get(video['uuid']) or _get_video_subtitles(hostname, bearer_token, video['uuid'])
+    if subtitles and subtitles['total'] and subtitles['data'][0]['captionPath'].endswith('.vtt'):
+      video['captions'] = subtitles
       videos_with_subtitles.append(video)
-      click.echo(click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has {len(subtitles)} "
-                             f"subtitles (total WITH {len(videos_with_subtitles)}).", fg='green'))
+      click.echo(click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has "
+                             f"{len(subtitles['data'])} subtitles (total WITH {len(videos_with_subtitles)}).",
+                             fg='green'))
     else:
       videos_without_subtitles.append(video)
-      click.echo(click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has {len(subtitles)} "
+      click.echo(click.style(f"Video {str(idx).zfill(4)}/{len(all_videos)} {video['uuid']} has no processable "
                              f"subtitles (total WITHOUT {len(videos_without_subtitles)}).", fg='yellow'))
 
   # Dump to JSON files
-  videos_by_subtitles_path = 'data/video-inventory-by-subtitles.json'
   with open(videos_by_subtitles_path, 'w') as videos_by_subtitles_file:
     videos_by_subtitles_file.write(json.dumps({
       'videos_without_subtitles': videos_without_subtitles,

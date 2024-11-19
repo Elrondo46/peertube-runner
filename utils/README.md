@@ -51,3 +51,25 @@ while true; do
     sleep 600
 done
 ```
+
+Archive video metadata and captions
+-----------------------------------
+
+The `archive-video-metadata.py` script can be used to archive video metadata and captions in a Git
+repository. This is useful for keeping a backup of your AI generated transcriptions.
+
+```bash
+export PT_HOSTNAME=my-peertube.com
+export PT_TOKEN=$(jq -r .access_token data/auth-bearer-token.json)
+python3 archive-video-metadata.py $PT_HOSTNAME $PT_TOKEN data/peertube-captions
+```
+
+The script will initialize a new Git repository in `data/peertube-captions` and commit the video
+metadata and captions. Inspect the repository with `git status` and `git log`:
+
+```bash
+cd data/peertube-captions
+git status
+git log
+cd ../..
+```

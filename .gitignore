@@ -2,3 +2,5 @@
 utils/data/
 venv/
 dot-*
+*.vtt
+.DS_Store
