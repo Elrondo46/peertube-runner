@@ -19,12 +19,16 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       # Build and test PeerTube 5.2 image as tag "v521"
+      - name: Pull the `owntube/peertube-runner:v521` Docker image if it exists
+        run: docker pull owntube/peertube-runner:v521 || true
       - name: Build the `owntube/peertube-runner:v521` Docker image
         run: docker buildx build . --platform linux/amd64 --file Dockerfile.bullseye --tag owntube/peertube-runner:v521
       - name: Test the `owntube/peertube-runner:v521` Docker image
         run: docker run -i --rm --name v521-runner-help owntube/peertube-runner:v521 peertube-runner --help
 
       # Build and test PeerTube 6.3.2 image as tag "v632"
+      - name: Pull the `owntube/peertube-runner:v632` Docker image if it exists
+        run: docker pull owntube/peertube-runner:v632 || true
       - name: Build the `owntube/peertube-runner:v632` Docker image
         run: docker buildx build . --platform linux/amd64 --file Dockerfile.bookworm --tag owntube/peertube-runner:v632
       - name: Test the `owntube/peertube-runner:v632` Docker image
