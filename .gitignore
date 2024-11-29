@@ -3,4 +3,5 @@ utils/data/
 venv/
 dot-*
 *.vtt
+*.srt
 .DS_Store
