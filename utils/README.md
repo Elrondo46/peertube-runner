@@ -2,7 +2,7 @@
 `OwnTube-tv/peertube-runner/utils`
 ==================================
 
-This directory contains utility scripts for dealing with PeerTube Runners.
+This directory contains utility scripts for dealing with PeerTube Runners and transcriptions.
 
 Setup a virtualenv and install the requirements:
 
@@ -10,10 +10,14 @@ Setup a virtualenv and install the requirements:
 cd utils/
 python3 -m venv venv
 source venv/bin/activate
-pip install click requests
+pip install click requests deepl sh
 ```
 
-Then you can run the `issue-auth-token.py` script to issue a new authentication token:
+
+Authenticate with your PeerTube site
+------------------------------------
+
+Run the `issue-auth-token.py` script to issue a new authentication token:
 
 ```bash
 export PT_HOSTNAME=my-peertube.com
@@ -22,8 +26,12 @@ export PT_PASSWORD=myP4ssw0rd
 python3 issue-auth-token.py $PT_HOSTNAME $PT_USERNAME $PT_PASSWORD
 ```
 
-Now you can use the token to run the `build-video-inventory.py` script to build a video inventory
-from your PeerTube site:
+
+Generate video captions (slowly)
+--------------------------------
+
+You can use your authentication token to run the `build-video-inventory.py` script to build
+a video inventory from your PeerTube site:
 
 ```bash
 export PT_HOSTNAME=my-peertube.com
@@ -52,6 +60,7 @@ while true; do
 done
 ```
 
+
 Archive video metadata and captions
 -----------------------------------
 
@@ -73,3 +82,32 @@ git status
 git log
 cd ../..
 ```
+
+
+Translate video captions using DeepL
+------------------------------------
+
+Register a DeepL API Free account at https://www.deepl.com/en/pro/change-plan#developer and
+download your API key. Copy a WebVTT video caption file to the `data/` directory and run the
+`convert-webvtt-to-srt.py` script to convert it to a DeepL compatible file format (SRT):
+
+```bash
+python3 convert-webvtt-to-srt.py data/my-video.vtt data/my-video.srt
+```
+
+Then run the `deepl-translate-srt.py` script to translate the SRT file to another language:
+
+```bash
+export DEEPL_API_KEY=my-deepl-api-key
+python3 deepl-translate-srt.py data/my-video.srt EN-US data/my-video_en.srt --auth_key $DEEPL_API_KEY
+```
+
+The script will translate the SRT file to English (US) and save the translated file as
+`data/my-video_en.srt`, convert it back to WebVTT format and save it as `data/my-video_en.vtt`:
+
+```bash
+python3 convert-srt-to-webvtt.py data/my-video_en.srt data/my-video_en.vtt
+```
+
+You can now attach the translated captions to your PeerTube video by choosing language and
+uploading the new WebVTT file.
