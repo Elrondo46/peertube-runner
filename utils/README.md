@@ -89,10 +89,10 @@ Translate video captions using DeepL
 
 Register a DeepL API Free account at https://www.deepl.com/en/pro/change-plan#developer and
 download your API key. Copy a WebVTT video caption file to the `data/` directory and run the
-`convert-webvtt-to-srt.py` script to convert it to a DeepL compatible file format (SRT):
+`convert-vtt-to-srt.py` script to convert it to a DeepL compatible file format (SRT):
 
 ```bash
-python3 convert-webvtt-to-srt.py data/my-video.vtt data/my-video.srt
+python3 convert-vtt-to-srt.py data/my-video.vtt data/my-video.srt
 ```
 
 Then run the `deepl-translate-srt.py` script to translate the SRT file to another language:
@@ -106,7 +106,7 @@ The script will translate the SRT file to English (US) and save the translated f
 `data/my-video_en.srt`, convert it back to WebVTT format and save it as `data/my-video_en.vtt`:
 
 ```bash
-python3 convert-srt-to-webvtt.py data/my-video_en.srt data/my-video_en.vtt
+python3 convert-srt-to-vtt.py data/my-video_en.srt data/my-video_en.vtt
 ```
 
 You can now attach the translated captions to your PeerTube video by choosing language and
