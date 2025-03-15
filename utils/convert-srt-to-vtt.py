@@ -91,7 +91,9 @@ def srt_to_vtt(srt_file, vtt_file):
                      f"{repr(vtt_content[:50])}...{repr(vtt_content[-10:])}")
           click.echo(f"Beginning...end of output SRT:       "
                      f"{repr(reverted_srt_content[:50])}...{repr(reverted_srt_content[-10:])}")
-          raise AssertionError("Conversion failed")
+          # check if convert anyway
+          if not click.confirm("Do you want to proceed with the conversion?", default=False):
+            raise AssertionError("Conversion failed")
 
         assert vtt_file.endswith(".vtt"), "Output file must be a WebVTT file"
         with open(vtt_file, "w", encoding="utf-8") as output_file:
