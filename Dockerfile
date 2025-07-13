@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --break-system-packages whisper-ctranslate2
+RUN npm install -g npm
 RUN npm install @peertube/peertube-runner
 
 WORKDIR /home/peertube/
