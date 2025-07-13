@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --break-system-packages whisper-ctranslate2
-RUN npm install @peertube/peertube-runner@0.1.3
+RUN npm install @peertube/peertube-runner
 
 WORKDIR /home/peertube/
 
@@ -16,7 +16,7 @@ ENV HOME=/home/peertube
 USER 999
 
 # https://docs.joinpeertube.org/maintain/tools#peertube-runner
-RUN npm install @peertube/peertube-runner@0.1.3
+RUN npm install @peertube/peertube-runner
 
 VOLUME [ "/home/peertube/.config/peertube-runner-nodejs/" ]
 VOLUME [ "/home/peertube/.cache/peertube-runner-nodejs/" ]
