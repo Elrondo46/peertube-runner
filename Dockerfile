@@ -2,8 +2,10 @@
 FROM chocobozzz/peertube:v7.2.1-bookworm
 
 RUN apt-get update && apt-get install -y \
-    pipx \
+    pip \
     && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --break-system-packages whisper-ctranslate2
 
 WORKDIR /home/peertube/
 
@@ -13,7 +15,6 @@ ENV HOME=/home/peertube
 USER 999
 
 # https://docs.joinpeertube.org/maintain/tools#peertube-runner
-RUN pipx install --break-system-packages whisper-ctranslate2
 RUN npm install @peertube/peertube-runner@0.1.3
 
 ENV PATH="${PATH}:/home/peertube/.local/bin"
