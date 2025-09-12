@@ -1,5 +1,5 @@
 # https://github.com/Chocobozzz/PeerTube/blob/v7.2.1/support/docker/production/Dockerfile.bookworm
-FROM chocobozzz/peertube:v7.2.3-bookworm
+FROM chocobozzz/peertube:v7.3.0-bookworm
 
 RUN apt-get update && apt-get install -y \
     pip \
